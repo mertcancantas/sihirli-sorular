@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sihirli Soru ❤️</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      color: white;
+      background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
+      overflow: hidden;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      position: relative;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    #yes {
+      background-color: #ff6600;
+      color: white;
+      margin-left: -100px;
+    }
+
+    #no {
+      background-color: #555;
+      color: white;
+      position: absolute;
+    }
+
+    /* Kalpler */
+    .heart {
+      position: fixed;
+      top: -10px;
+      color: #ff4d6d;
+      font-size: 20px;
+      animation: fall linear forwards;
+      opacity: 0.9;
+      z-index: 0;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+
+    /* Konfeti */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: hsl(var(--hue), 90%, 60%);
+      animation: explode 1s ease-out forwards;
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    @keyframes explode {
+      0% { transform: scale(0) translate(0, 0); opacity: 1; }
+      100% { transform: scale(1) translate(var(--x), var(--y)); opacity: 0; }
+    }
+
+    /* Hayır butonu (küçük sayfa) */
+    .small-no {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background-color: #333;
+      color: white;
+      font-size: 0.8rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    /* Son sayfadaki resim */
+    .final-image {
+      max-width: 80%;
+      max-height: 80vh;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.2rem;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      .final-image {
+        max-width: 90%;
+        max-height: 70vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 id="question">Biraz daha tanışalım mı?</h1>
+  <div class="buttons">
+    <button id="yes">Evet</button>
+    <button id="no">Hayır</button>
+  </div>
+
+  <script>
+    const yesButton = document.getElementById("yes");
+    const noButton = document.getElementById("no");
+    const question = document.getElementById("question");
+    const buttonsDiv = document.querySelector(".buttons");
+
+    let page = 1;
+    let yesScale = 1;
+    let heartInterval, confettiInterval;
+
+    function moveNoButton() {
+      const bodyRect = document.body.getBoundingClientRect();
+      const questionRect = question.getBoundingClientRect();
+      const yesRect = yesButton.getBoundingClientRect();
+
+      const excludedTop = questionRect.bottom;
+      const excludedBottom = yesRect.top;
+      const excludedLeft = yesRect.left - 50;
+      const excludedRight = yesRect.right + 50;
+
+      let newX, newY;
+      do {
+        newX = Math.random() * (bodyRect.width - noButton.offsetWidth);
+        newY = Math.random() * (bodyRect.height - noButton.offsetHeight);
+      } while (
+        newY > excludedTop - 40 &&
+        newY < excludedBottom + 40 &&
+        newX > excludedLeft - 40 &&
+        newX < excludedRight + 40
+      );
+
+      noButton.style.left = `${newX}px`;
+      noButton.style.top = `${newY}px`;
+    }
+
+    noButton.addEventListener("click", () => {
+      if (page === 1) {
+        moveNoButton();
+      } else if (page === 2) {
+        yesScale += 0.2;
+        yesButton.style.transform = `scale(${yesScale})`;
+      }
+    });
+
+    yesButton.addEventListener("click", () => {
+      if (page === 1) {
+        page = 2;
+        question.textContent = "Peki, kalbini çalmama izin var mı?";
+        yesButton.style.transform = "scale(1)";
+        noButton.style.left = "";
+        noButton.style.top = "";
+      } else if (page === 2) {
+        page = 3;
+        question.textContent = "Bir ihtimal var mı?❤️";
+        yesButton.textContent = "Evet!";
+        noButton.remove();
+      } else if (page === 3) {
+        showHeartsAndConfetti();
+      }
+    });
+
+    function showHeartsAndConfetti() {
+      document.body.innerHTML = ""; 
+      document.body.style.background = "#1b1b1b";
+
+      // Kalpler
+      heartInterval = setInterval(() => {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.textContent = "❤️";
+        heart.style.left = Math.random() * window.innerWidth + "px";
+        heart.style.animationDuration = Math.random() * 3 + 2 + "s";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+      }, 200);
+
+      // Konfeti
+      confettiInterval = setInterval(() => {
+        for (let i = 0; i < 15; i++) {
+          const conf = document.createElement("div");
+          conf.classList.add("confetti");
+          conf.style.setProperty("--hue", Math.random() * 360);
+          conf.style.setProperty("--x", (Math.random() - 0.5) * 300 + "px");
+          conf.style.setProperty("--y", (Math.random() - 0.5) * 300 + "px");
+          conf.style.left = window.innerWidth / 2 + "px";
+          conf.style.top = window.innerHeight / 2 + "px";
+          document.body.appendChild(conf);
+          setTimeout(() => conf.remove(), 1000);
+        }
+      }, 1200);
+
+      // Küçük hayır butonu
+      const smallNo = document.createElement("button");
+      smallNo.classList.add("small-no");
+      smallNo.textContent = "Yine De Hayır";
+      document.body.appendChild(smallNo);
+
+      smallNo.addEventListener("click", () => {
+        // Kalp ve konfeti durdur
+        clearInterval(heartInterval);
+        clearInterval(confettiInterval);
+        document.body.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;">
+            <img class="final-image" src="https://i.ytimg.com/vi/EWpkOQsvFjU/maxresdefault.jpg" alt="Hayır">
+          </div>`;
+      });
+    }
+  </script>
+</body>
+</html>
